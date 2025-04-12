@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: mnode
+  name: mnode
+spec:
+  serviceName: mnode
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mnode
+  template:
+    metadata:
+      labels:
+        app: mnode
+    spec:
+      containers:
+      - image: docker.io/library/mnode
+        name: mnode
+        imagePullPolicy: Never
+        command: ["service", "ssh", "start", "-D"]
