@@ -1,0 +1,21 @@
+apiVersion: v1
+data:
+  inventory.yaml: |
+    myhosts:
+      hosts:
+        mpod-[0:0].mpod.default:
+
+  playbook.yaml: |
+    - name: My first play
+      hosts: myhosts
+      tasks:
+      - name: Ping my hosts
+        ansible.builtin.ping:
+
+      - name: Print message
+        ansible.builtin.debug:
+          msg: Hello world
+
+kind: ConfigMap
+metadata:
+  name: ansible-config

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: client
+  name: client
+spec:
+  containers:
+  - image: docker.io/library/client
+    name: client
+    imagePullPolicy: Never
+    command: ["/bin/bash", "-c", "while true; do sleep 1; done"]
+    volumeMounts:
+      - name: ansible-config
+        mountPath: /opt/ansible_quickstart
+  volumes:
+  - name: ansible-config
+    configMap:
+      name: ansible-config

@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: mnode
-  name: mnode
+    app: mpod
+  name: mpod
 spec:
-  serviceName: mnode
+  serviceName: mpod
   replicas: 1
   selector:
     matchLabels:
-      app: mnode
+      app: mpod
   template:
     metadata:
       labels:
-        app: mnode
+        app: mpod
     spec:
       containers:
-      - image: docker.io/library/mnode
-        name: mnode
+      - image: docker.io/library/mpod
+        name: mpod
         imagePullPolicy: Never
         command: ["service", "ssh", "start", "-D"]
