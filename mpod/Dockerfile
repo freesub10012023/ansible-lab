@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY ./id_rsa.pub /root/.ssh/authorized_keys
+COPY id_rsa.pub /root/.ssh/authorized_keys
 
 RUN apt update && \
     apt install vim ssh -y && \

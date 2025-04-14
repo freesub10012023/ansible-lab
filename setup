@@ -1,0 +1,84 @@
+#!/bin/bash
+
+set -e
+
+GREEN='\033[0;32m'
+OPTSTRING=":m:"
+
+main() {
+  while getopts ${OPTSTRING} opt; do
+    case ${opt} in
+      m)
+        if [[ $OPTARG == "delete" ]] || [[ $OPTARG == "create" ]]; then
+          eval $OPTARG
+          exit 0
+        else
+          echo "Invalid mode: $OPTARG"
+          usage
+          exit 1
+        fi
+        ;;
+      :)
+        echo "Option -${OPTARG} requires an argument."
+        usage
+        exit 1
+        ;;
+      ?)
+        echo "Invalid option: -${OPTARG}."
+        usage
+        exit 1
+        ;;
+    esac
+  done
+}
+
+
+delete() {
+  rm -f client/id_rsa
+  rm -f mpod/id_rsa.pub
+  kind delete cluster --name=ansible-playground
+  docker rmi -f client
+  docker rmi -f mpod
+  echo -e "${GREEN}Success!🎉🙌"
+
+}
+
+create() {
+  # delete regardless
+  delete > /dev/null
+  echo -e "${GREEN}Initializing playground..."
+
+  # Generate ssh key pairs
+  ssh-keygen -t rsa -q -f "./id_rsa" -N ""
+  mv id_rsa client/
+  mv id_rsa.pub mpod/
+  echo Created ssh key pairs 🔑😊
+
+  # Build the client & mpod images
+  docker build -t client client
+  docker build -t mpod mpod
+  echo Built docker images 🐳💻
+
+  # Create the cluster
+  kind create cluster --config=kind-config.yaml
+
+  # Load the images to the kind cluster
+  kind load  docker-image client --name ansible-playground
+  kind load  docker-image mpod --name ansible-playground
+  echo Loaded docker images to the cluster 🚢🔄🌐
+
+  # Apply all the objects
+  kubectl apply -f client/manifests
+  kubectl apply -f mpod/manifests
+  echo Created manifests 📜✅
+
+  echo -e "${GREEN}All done!🎉🙌"
+}
+
+usage() {
+  echo -e "\nUsage:\n"
+  echo -e "To create the playground run: \n$0 -m create\n"
+  echo -e "To delete the playground run: \n$0 -m delete\n"
+}
+
+main "$@"
